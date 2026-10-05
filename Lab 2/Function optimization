@@ -1,0 +1,77 @@
+import random
+
+# Fitness function
+def fitness(x):
+    return x * (100 - x)
+
+
+def express(chromosome):
+    x = chromosome[0] * 10 + chromosome[1]
+    return x
+
+
+# Parameters
+population_size = 6
+generations = 10
+mutation_rate = 0.1
+
+# Initial population
+population = []
+
+for i in range(population_size):
+    chromosome = [random.randint(0, 9), random.randint(0, 9)]
+    population.append(chromosome)
+
+
+for generation in range(generations):
+
+    # Gene expression
+    values = [express(c) for c in population]
+
+    # Fitness calculation
+    fitness_values = [fitness(x) for x in values]
+
+    print("Generation", generation + 1)
+    for i in range(population_size):
+        print(population[i], "->", values[i],
+              "Fitness =", fitness_values[i])
+
+    # Selection
+    ranked = sorted(
+        zip(population, fitness_values),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    parents = [item[0] for item in ranked[:3]]
+
+    # Crossover
+    new_population = parents.copy()
+
+    while len(new_population) < population_size:
+
+        p1 = random.choice(parents)
+        p2 = random.choice(parents)
+
+        # One-point crossover
+        child = [p1[0], p2[1]]
+
+        new_population.append(child)
+
+    # Mutation
+    for chromosome in new_population:
+        for i in range(2):
+            if random.random() < mutation_rate:
+                chromosome[i] = random.randint(0, 9)
+
+    population = new_population
+
+
+values = [express(c) for c in population]
+best_index = max(range(population_size),
+                 key=lambda i: fitness(values[i]))
+
+print("\nBest Solution")
+print("Chromosome:", population[best_index])
+print("x =", values[best_index])
+print("Maximum Fitness =", fitness(values[best_index]))
